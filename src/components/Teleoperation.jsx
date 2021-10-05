@@ -21,13 +21,10 @@ class Teleoperation extends Component {
 
 		this.state.ros.on("connection", () => {
 			console.info("Connected to ROS:TELEOP");
-			this.setState({connected:true});
 		});
 
 		this.state.ros.on("close", () => {
 			console.warn("Disconnected from ROS:TELEOP");
-			this.setState({connected:false});
-			//try to reconnect every 3 seconds
 			setTimeout(()=>{
 				try{
 					this.state.ros.connect(
@@ -39,6 +36,8 @@ class Teleoperation extends Component {
 			},Config.RECONNECTION_TIMER);
 		});
 
+		this.state.ros.on("error", (error) => {});
+
 		try{
 			this.state.ros.connect(
 				"ws://"+Config.ROSBRIDGE_SERVER_IP+":"+Config.ROSBRIDGE_SERVER_PORT+""
@@ -46,10 +45,6 @@ class Teleoperation extends Component {
 		}catch(error){
 			console.error("Connection problem : TELEOP");
 		}
-
-		this.state.ros.on("error", (error) => {
-			// console.log('Error connecting to ROS: ', error);
-		});
 	}
 
 	handleMove(event){
@@ -106,7 +101,7 @@ class Teleoperation extends Component {
 		return ( 
 			<div>
 				<Joystick 
-				size={100} 
+				size={150} 
 				baseColor="#EEEEEE" 
 				stickColor="#BBBBBB"
 				move={this.handleMove} 

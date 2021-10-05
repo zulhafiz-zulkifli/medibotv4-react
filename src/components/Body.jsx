@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import {Container} from "react-bootstrap";
 import {Route, BrowserRouter as Router, Switch} from "react-router-dom"
 import Home from './Home';
-import About from './About';
+import Navigation from './Navigation';
 
 class Body extends Component {
 	render() {
@@ -12,7 +12,7 @@ class Body extends Component {
 				<Router>
 					<Switch>
 						<Route path="/" exact component={Home}></Route>
-						<Route path="/About" exact component={About}></Route>
+						<Route path="/Navigation" exact component={Navigation}></Route>
 					</Switch>
 				</Router>
 			</Container>

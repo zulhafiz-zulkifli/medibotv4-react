@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Alert} from "react-bootstrap";
+import {Alert, Spinner} from "react-bootstrap";
 import Config from "../scripts/config";
 
 class Connection extends Component {
@@ -17,12 +17,6 @@ class Connection extends Component {
 	init_connection(){
 		// eslint-disable-next-line
 		this.state.ros = new window.ROSLIB.Ros();
-		//console.log(this.state.ros);
-		// if(!this.state.connected){
-		// 	this.state.ros.connect(
-		// 	 	"ws://"+Config.ROSBRIDGE_SERVER_IP+":"+Config.ROSBRIDGE_SERVER_PORT+""
-		// 	);
-		// }
 
 		this.state.ros.on("connection", () => {
 			console.info("Connected to ROS:CONNECTION");
@@ -32,7 +26,6 @@ class Connection extends Component {
 		this.state.ros.on("close", () => {
 			console.warn("Disconnected from ROS:CONNECTION");
 			this.setState({connected:false});
-			//try to reconnect every 3 seconds
 			setTimeout(()=>{
 				try{
 					this.state.ros.connect(
@@ -44,6 +37,8 @@ class Connection extends Component {
 			},Config.RECONNECTION_TIMER);
 		});
 
+		this.state.ros.on("error", (error) => {});
+
 		try{
 			this.state.ros.connect(
 				"ws://"+Config.ROSBRIDGE_SERVER_IP+":"+Config.ROSBRIDGE_SERVER_PORT+""
@@ -51,10 +46,6 @@ class Connection extends Component {
 		}catch(error){
 			console.error("Connection problem : CONNECTION");
 		}
-
-		this.state.ros.on("error", (error) => {
-			// console.log('Error connecting to ROS: ', error);
-		});
 	}
 
 
@@ -62,7 +53,9 @@ class Connection extends Component {
 		return ( 
 			<div>
 				<Alert className="text-center m-3" variant={this.state.connected?"success":"danger"}>
-					{this.state.connected? "Robot Connected":"Robot Disconnected"}
+					{this.state.connected? "Robot Connected":"Robot Disconnected"}&emsp;
+					<Spinner animation={this.state.connected?"grow":"border"} 
+					variant={this.state.connected?"danger":"light"} size="sm"/>
 				</Alert>
 			</div>
 		);

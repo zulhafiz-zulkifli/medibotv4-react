@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import {Row, Col} from "react-bootstrap";
+import {Row, Col, ListGroup} from "react-bootstrap";
 import Config from "../scripts/config";
 import * as Three from "three";
+import Teleoperation from "./Teleoperation";
 
 class RobotState extends Component {
 	state = {
@@ -9,7 +10,7 @@ class RobotState extends Component {
 		x:0,
 		y:0,
 		orientation:0,
-		linear_velocity:0,
+		linear_velocity:0.00,
 		angular_velocity:0
 	};
 
@@ -69,10 +70,8 @@ class RobotState extends Component {
 		});
 		//create a twist callback
 		vel_subscriber.subscribe((message)=>{
-			this.setState({linear_velocity:message.linear.x.toFixed(2)});
-			this.setState({angular_velocity:message.angular.z.toFixed(2)});
-			//this.setState({orientation:message.theta.toFixed(2)});
-			//this.setState({orientation:this.getOrientationFromQuaternion(message.pose.pose.orientation).toFixed(2)});
+			this.setState({linear_velocity:message.linear.x});
+			this.setState({angular_velocity:message.angular.z});
 		});
 
 		//create a pose subscriber
@@ -83,9 +82,8 @@ class RobotState extends Component {
 		});
 		//create a pose callback
 		pose_subscriber.subscribe((message)=>{
-			this.setState({x:message.pose.pose.position.x.toFixed(2)});
-			this.setState({y:message.pose.pose.position.y.toFixed(2)});
-			//this.setState({orientation:message.theta.toFixed(2)});
+			this.setState({x:message.pose.pose.position.x});
+			this.setState({y:message.pose.pose.position.y});
 			this.setState({orientation:this.getOrientationFromQuaternion(message.pose.pose.orientation).toFixed(2)});
 		});
 	}
@@ -105,21 +103,35 @@ class RobotState extends Component {
 	render() {
 		return ( 
 			<div>
-				<Row>
-					<Col>
-						<h4 className="mt-4">Position</h4>
-						<p className="mt-0">x : {this.state.x}</p>
-						<p className="mt-0">y : {this.state.x}</p>
-						<p className="mt-0">Orientation : {this.state.orientation}</p>
-					</Col>
-				</Row>
-				<Row>
-					<Col>
-						<h4 className="mt-4">Velocity</h4>
-						<p className="mt-0">Linear Velocity : {this.state.linear_velocity}</p>
-						<p className="mt-0">Angular Velocity : {this.state.angular_velocity}</p>
-					</Col>
-				</Row>
+				<ListGroup>
+						<ListGroup.Item variant="dark">
+							<Row>
+								<Col>
+									<h4 className="mt-4">Velocity</h4>
+									<p className="mt-0">Linear Velocity : {this.state.linear_velocity.toFixed(2)}</p>
+									<p className="mt-0">Angular Velocity : {this.state.angular_velocity.toFixed(2)}</p>
+								</Col>
+								<Col>
+									<h4 className="mt-4">Position</h4>
+									<p className="mt-0">x : {this.state.x.toFixed(2)}</p>
+									<p className="mt-0">y : {this.state.x.toFixed(2)}</p>
+									<p className="mt-0">θ : {this.state.orientation.toFixed(2)}</p>
+								</Col>
+							</Row>
+							<Row>
+								<Col>
+									<h4 className="mt-4">Motor Speed</h4>
+									<p className="mt-0">Straight PWM : {this.state.linear_velocity.toFixed(2)}</p>
+									<p className="mt-0">Turning PWM : {this.state.angular_velocity.toFixed(2)}</p>
+								</Col>
+								&emsp;&emsp;
+								<Col>
+									<br/><Teleoperation/>
+								</Col>
+							</Row>
+							<br/>
+						</ListGroup.Item>
+				</ListGroup>
 			</div>
 		);
 	}
