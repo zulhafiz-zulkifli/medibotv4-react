@@ -20,12 +20,12 @@ class Teleoperation extends Component {
 		this.state.ros = new window.ROSLIB.Ros();
 
 		this.state.ros.on("connection", () => {
-			console.log("Connection to websocket server established!");
+			console.info("Connected to ROS:TELEOP");
 			this.setState({connected:true});
 		});
 
 		this.state.ros.on("close", () => {
-			console.log("Connection to websocket server closed!");
+			console.warn("Disconnected from ROS:TELEOP");
 			this.setState({connected:false});
 			//try to reconnect every 3 seconds
 			setTimeout(()=>{
@@ -34,7 +34,7 @@ class Teleoperation extends Component {
 						"ws://"+Config.ROSBRIDGE_SERVER_IP+":"+Config.ROSBRIDGE_SERVER_PORT+""
 					);
 				}catch(error){
-					console.log("connection problem");
+					console.error("Connection problem : TELEOP");
 				}
 			},Config.RECONNECTION_TIMER);
 		});
@@ -44,11 +44,11 @@ class Teleoperation extends Component {
 				"ws://"+Config.ROSBRIDGE_SERVER_IP+":"+Config.ROSBRIDGE_SERVER_PORT+""
 			);
 		}catch(error){
-			console.log("connection problem");
+			console.error("Connection problem : TELEOP");
 		}
 
 		this.state.ros.on("error", (error) => {
-			// console.log('Error connecting to websocket server: ', error);
+			// console.log('Error connecting to ROS: ', error);
 		});
 	}
 
@@ -108,7 +108,7 @@ class Teleoperation extends Component {
 				<Joystick 
 				size={100} 
 				baseColor="#EEEEEE" 
-				stickColor="#BBBBBB" 
+				stickColor="#BBBBBB"
 				move={this.handleMove} 
 				stop={this.handleStop}
 				></Joystick>

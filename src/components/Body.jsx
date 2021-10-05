@@ -6,8 +6,8 @@ import About from './About';
 
 class Body extends Component {
 	render() {
-		
 		return ( 
+			<main>
 			<Container>
 				<Router>
 					<Switch>
@@ -16,6 +16,7 @@ class Body extends Component {
 					</Switch>
 				</Router>
 			</Container>
+			</main>
 		);
 		
 	}

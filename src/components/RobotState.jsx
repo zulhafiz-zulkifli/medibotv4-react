@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Row, Col, Container, Button} from "react-bootstrap";
+import {Row, Col} from "react-bootstrap";
 import Config from "../scripts/config";
 import * as Three from "three";
 
@@ -23,12 +23,12 @@ class RobotState extends Component {
 		this.state.ros = new window.ROSLIB.Ros();
 
 		this.state.ros.on("connection", () => {
-			console.log("Connection to websocket server established!");
+			console.info("Connected to ROS:ROBOTSTATE");
 			this.setState({connected:true});
 		});
 
 		this.state.ros.on("close", () => {
-			console.log("Connection to websocket server closed!");
+			console.warn("Disconnected from ROS:ROBOTSTATE");
 			this.setState({connected:false});
 			//try to reconnect every 3 seconds
 			setTimeout(()=>{
@@ -37,7 +37,7 @@ class RobotState extends Component {
 						"ws://"+Config.ROSBRIDGE_SERVER_IP+":"+Config.ROSBRIDGE_SERVER_PORT+""
 					);
 				}catch(error){
-					console.log("connection problem");
+					console.error("Connection problem : ROBOTSTATE");
 				}
 			},Config.RECONNECTION_TIMER);
 		});
@@ -47,11 +47,11 @@ class RobotState extends Component {
 				"ws://"+Config.ROSBRIDGE_SERVER_IP+":"+Config.ROSBRIDGE_SERVER_PORT+""
 			);
 		}catch(error){
-			console.log("connection problem");
+			console.error("Connection problem : ROBOTSTATE");
 		}
 
 		this.state.ros.on("error", (error) => {
-			// console.log('Error connecting to websocket server: ', error);
+			// console.log('Error connecting to ROS: ', error);
 		});
 	}
 
@@ -60,21 +60,33 @@ class RobotState extends Component {
 	}
 
 	getRobotState(){
+		//create a twist subscriber
+		var vel_subscriber = new window.ROSLIB.Topic({
+			ros : this.state.ros,
+			name : Config.CMD_VEL_TOPIC,
+			messageType : "geometry_msgs/Twist"
+			//messageType: "geometry_msgs/PoseWithCovariance"
+		});
+		//create a twist callback
+		vel_subscriber.subscribe((message)=>{
+			this.setState({linear_velocity:message.linear.x.toFixed(2)});
+			this.setState({angular_velocity:message.angular.z.toFixed(2)});
+			//this.setState({orientation:message.theta.toFixed(2)});
+			//this.setState({orientation:this.getOrientationFromQuaternion(message.pose.pose.orientation).toFixed(2)});
+		});
+
 		//create a pose subscriber
 		var pose_subscriber = new window.ROSLIB.Topic({
 			ros : this.state.ros,
-			name : Config.POSE_TOPIC,
-			messageType : "turtlesim/Pose"
-			//messageType: "geometry_msgs/PoseWithCovariance"
+			name : Config.ODOM_TOPIC,
+			messageType : "nav_msgs/Odometry"
 		});
 		//create a pose callback
 		pose_subscriber.subscribe((message)=>{
-			this.setState({x:message.x.toFixed(2)});
-			this.setState({y:message.y.toFixed(2)});
-			this.setState({orientation:message.theta.toFixed(2)});
-			//this.setState({orientation:this.getOrientationFromQuaternion(message.pose.pose.orientation).toFixed(2)});
-			this.setState({linear_velocity:message.linear_velocity.toFixed(2)});
-			this.setState({angular_velocity:message.angular_velocity.toFixed(2)});
+			this.setState({x:message.pose.pose.position.x.toFixed(2)});
+			this.setState({y:message.pose.pose.position.y.toFixed(2)});
+			//this.setState({orientation:message.theta.toFixed(2)});
+			this.setState({orientation:this.getOrientationFromQuaternion(message.pose.pose.orientation).toFixed(2)});
 		});
 	}
 
@@ -104,8 +116,8 @@ class RobotState extends Component {
 				<Row>
 					<Col>
 						<h4 className="mt-4">Velocity</h4>
-						<p className="mt-0">Linear : {this.state.linear_velocity}</p>
-						<p className="mt-0">Angular : {this.state.angular_velocity}</p>
+						<p className="mt-0">Linear Velocity : {this.state.linear_velocity}</p>
+						<p className="mt-0">Angular Velocity : {this.state.angular_velocity}</p>
 					</Col>
 				</Row>
 			</div>

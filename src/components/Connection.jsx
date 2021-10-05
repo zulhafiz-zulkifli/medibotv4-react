@@ -25,12 +25,12 @@ class Connection extends Component {
 		// }
 
 		this.state.ros.on("connection", () => {
-			console.log("Connection to websocket server established!");
+			console.info("Connected to ROS:CONNECTION");
 			this.setState({connected:true});
 		});
 
 		this.state.ros.on("close", () => {
-			console.log("Connection to websocket server closed!");
+			console.warn("Disconnected from ROS:CONNECTION");
 			this.setState({connected:false});
 			//try to reconnect every 3 seconds
 			setTimeout(()=>{
@@ -39,7 +39,7 @@ class Connection extends Component {
 						"ws://"+Config.ROSBRIDGE_SERVER_IP+":"+Config.ROSBRIDGE_SERVER_PORT+""
 					);
 				}catch(error){
-					console.log("connection problem");
+					console.error("Connection problem : CONNECTION");
 				}
 			},Config.RECONNECTION_TIMER);
 		});
@@ -49,11 +49,11 @@ class Connection extends Component {
 				"ws://"+Config.ROSBRIDGE_SERVER_IP+":"+Config.ROSBRIDGE_SERVER_PORT+""
 			);
 		}catch(error){
-			console.log("connection problem");
+			console.error("Connection problem : CONNECTION");
 		}
 
 		this.state.ros.on("error", (error) => {
-			// console.log('Error connecting to websocket server: ', error);
+			// console.log('Error connecting to ROS: ', error);
 		});
 	}
 
