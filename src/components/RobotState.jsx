@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Row, Col, ListGroup} from "react-bootstrap";
+import {Row, Col, ListGroup, Button, ButtonGroup} from "react-bootstrap";
 import Config from "../scripts/config";
 import * as Three from "three";
 import Teleoperation from "./Teleoperation";
@@ -10,13 +10,17 @@ class RobotState extends Component {
 		x:0,
 		y:0,
 		orientation:0,
-		linear_velocity:0.00,
-		angular_velocity:0
+		linear_velocity:0,
+		angular_velocity:0,
+		pwm:80,
+		pwm_turn:60,
+		pwm_control:false
 	};
 
 	constructor(){
 		super();
 		this.init_connection();
+		this.changePwm = this.changePwm.bind(this);
 	}
 
 	init_connection(){
@@ -58,6 +62,7 @@ class RobotState extends Component {
 
 	componentDidMount(){
 		this.getRobotState();
+		this.changePwm(0,0);
 	}
 
 	getRobotState(){
@@ -86,7 +91,64 @@ class RobotState extends Component {
 			this.setState({y:message.pose.pose.position.y});
 			this.setState({orientation:this.getOrientationFromQuaternion(message.pose.pose.orientation).toFixed(2)});
 		});
+
+		//create a pwm subscriber
+		var pwm_subscriber = new window.ROSLIB.Topic({
+			ros : this.state.ros,
+			name : Config.PWM_TOPIC,
+			messageType : "std_msgs/Int16"
+		});
+		//create a pwm callback
+		pwm_subscriber.subscribe((message)=>{
+			this.setState({pwm:message.data});
+		});
+
+		//create a pwm turn subscriber
+		var pwm_turn_subscriber = new window.ROSLIB.Topic({
+			ros : this.state.ros,
+			name : Config.PWM_TURN_TOPIC,
+			messageType : "std_msgs/Int16"
+		});
+		//create a pwm callback
+		pwm_turn_subscriber.subscribe((message)=>{
+			this.setState({pwm_turn:message.data});
+		});
 	}
+
+	changePwm(dpwm,dpwm_turn){
+	    var pwm_publisher = new window.ROSLIB.Topic({
+	        ros: this.state.ros,
+	        name: Config.PWM_TOPIC,
+	        messageType: 'std_msgs/Int16'
+	    });
+	    var pwm_turn_publisher = new window.ROSLIB.Topic({
+	        ros: this.state.ros,
+	        name: Config.PWM_TURN_TOPIC,
+	        messageType: 'std_msgs/Int16'
+	    });
+	    var pwm_msg = new window.ROSLIB.Message({
+	        data: this.state.pwm+dpwm
+	    });
+	    var pwm_turn_msg = new window.ROSLIB.Message({
+	        data: this.state.pwm_turn+dpwm_turn
+	    });
+	    pwm_publisher.publish(pwm_msg);
+	    pwm_turn_publisher.publish(pwm_turn_msg);
+	}
+
+	changeROSState(){
+		this.setState({pwm_control:!this.state.pwm_control});
+	    var pwm_control_publisher = new window.ROSLIB.Topic({
+	        ros: this.state.ros,
+	        name: Config.PWM_CONTROL_TOPIC,
+	        messageType: 'std_msgs/Bool'
+	    });
+	    var pwm_control_msg = new window.ROSLIB.Message({
+	        data: this.state.pwm_control
+	    });
+	    pwm_control_publisher.publish(pwm_control_msg);
+	}
+
 
 	getOrientationFromQuaternion(ros_orientation_quat){
 		var q = new Three.Quaternion(
@@ -104,29 +166,51 @@ class RobotState extends Component {
 		return ( 
 			<div>
 				<ListGroup>
-						<ListGroup.Item variant="dark">
+						<ListGroup.Item variant="light">
 							<Row>
 								<Col>
-									<h4 className="mt-4">Velocity</h4>
-									<p className="mt-0">Linear Velocity : {this.state.linear_velocity.toFixed(2)}</p>
-									<p className="mt-0">Angular Velocity : {this.state.angular_velocity.toFixed(2)}</p>
-								</Col>
+									<h4 className="mt-4">PWM Control&ensp;
+										<Button onClick={()=>{this.changeROSState()}} 
+										variant={this.state.pwm_control?"danger":"success"}>
+										{this.state.pwm_control?"OFF":"ON"}
+										</Button>
+									</h4>
+									<p className="mt-0">
+										<ButtonGroup vertical size="sm">
+											<Button onClick={()=>{this.changePwm(10,0)}} variant="secondary" 
+											disabled={this.state.pwm_control?true:false}>+</Button>
+											<Button onClick={()=>{this.changePwm(-10,0)}} variant="secondary"
+											disabled={this.state.pwm_control?true:false}>-</Button>
+										</ButtonGroup>
+										&emsp;Straight PWM : {this.state.pwm.toFixed(0)} 
+									</p>
+									<p className="mt-0">
+										<ButtonGroup vertical size="sm">
+										 	<Button onClick={()=>{this.changePwm(0,10)}} variant="secondary"
+										 	disabled={this.state.pwm_control?true:false}>+</Button>
+										 	<Button onClick={()=>{this.changePwm(0,-10)}} variant="secondary"
+										 	disabled={this.state.pwm_control?true:false}>-</Button>
+										</ButtonGroup>
+										&emsp;Turning PWM : {this.state.pwm_turn.toFixed(0)} 
+									</p>
+								</Col>&emsp;
 								<Col>
-									<h4 className="mt-4">Position</h4>
-									<p className="mt-0">x : {this.state.x.toFixed(2)}</p>
-									<p className="mt-0">y : {this.state.x.toFixed(2)}</p>
-									<p className="mt-0">θ : {this.state.orientation.toFixed(2)}</p>
+									<br/><Teleoperation/>
 								</Col>
 							</Row>
 							<Row>
 								<Col>
-									<h4 className="mt-4">Motor Speed</h4>
-									<p className="mt-0">Straight PWM : {this.state.linear_velocity.toFixed(2)}</p>
-									<p className="mt-0">Turning PWM : {this.state.angular_velocity.toFixed(2)}</p>
+									<h4 className="mt-4">Velocity</h4>
+									<p className="m-0">Linear Velocity : {this.state.linear_velocity.toFixed(2)}</p>
+									<p className="m-0">Angular Velocity : {this.state.angular_velocity.toFixed(2)}</p>
 								</Col>
 								&emsp;&emsp;
 								<Col>
-									<br/><Teleoperation/>
+									<h4 className="mt-4">Position</h4>
+									<p className="m-0">x : {this.state.x.toFixed(2)}</p>
+									<p className="m-0">y : {this.state.x.toFixed(2)}</p>
+									<p className="m-0">θ : {this.state.orientation.toFixed(2)}</p>
+									
 								</Col>
 							</Row>
 							<br/>

@@ -10,10 +10,12 @@ class Teleoperation extends Component {
 	constructor(){
 		super();
 		this.init_connection();
-
+		this.initTeleopKeyboard();
 		this.handleMove = this.handleMove.bind(this);
 		this.handleStop = this.handleStop.bind(this);
 	}
+
+
 
 	init_connection(){
 		// eslint-disable-next-line
@@ -47,6 +49,17 @@ class Teleoperation extends Component {
 		}
 	}
 
+	initTeleopKeyboard() {
+	    if (teleop == null) {
+	        // Initialize the teleop.
+	        var teleop = new window.KEYBOARDTELEOP.Teleop({
+	            ros: this.state.ros,
+	            topic: '/cmd_vel'
+	        });
+	    }
+	    //console.log('TeleopKeyboard Initialized.');
+	}
+
 	handleMove(event){
 		console.log("handle move");
 		//create a ROS publisher to /cmd_vel
@@ -58,14 +71,14 @@ class Teleoperation extends Component {
 		//create twist message to be published
 		var twist = new window.ROSLIB.Message({
 			linear:{
-				x: event.y/50 ,
+				x: event.y/150,
 				y: 0,
 				z: 0
 			},
 			angular:{
 				x: 0,
 				y: 0,
-				z: -event.x/50
+				z: -event.x/75
 			}
 		});
 		//publish the message to /cmd_vel
@@ -102,8 +115,8 @@ class Teleoperation extends Component {
 			<div>
 				<Joystick 
 				size={150} 
-				baseColor="#EEEEEE" 
-				stickColor="#BBBBBB"
+				baseColor="#BBBBBB"
+				stickColor="#EEEEEE" 
 				move={this.handleMove} 
 				stop={this.handleStop}
 				></Joystick>
@@ -113,3 +126,5 @@ class Teleoperation extends Component {
 }
 
 export default Teleoperation;
+
+
