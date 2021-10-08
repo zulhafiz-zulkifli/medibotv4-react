@@ -14,7 +14,9 @@ class RobotState extends Component {
 		angular_velocity:0,
 		pwm:80,
 		pwm_turn:60,
-		pwm_control:false
+		pwm_control:false,
+		lwheel:0,
+		rwheel:0
 	};
 
 	constructor(){
@@ -113,6 +115,28 @@ class RobotState extends Component {
 		pwm_turn_subscriber.subscribe((message)=>{
 			this.setState({pwm_turn:message.data});
 		});
+
+		//create a lwheel subscriber
+		var lwheel_subscriber = new window.ROSLIB.Topic({
+			ros : this.state.ros,
+			name : Config.ENCODER_LEFT_TOPIC,
+			messageType : "std_msgs/Int16"
+		});
+		//create a lwheel callback
+		lwheel_subscriber.subscribe((message)=>{
+			this.setState({lwheel:message.data});
+		});
+
+		//create a rwheel subscriber
+		var rwheel_subscriber = new window.ROSLIB.Topic({
+			ros : this.state.ros,
+			name : Config.ENCODER_RIGHT_TOPIC,
+			messageType : "std_msgs/Int16"
+		});
+		//create a rwheel callback
+		rwheel_subscriber.subscribe((message)=>{
+			this.setState({rwheel:message.data});
+		});
 	}
 
 	changePwm(dpwm,dpwm_turn){
@@ -198,19 +222,24 @@ class RobotState extends Component {
 									<br/><Teleoperation/>
 								</Col>
 							</Row>
+						</ListGroup.Item>
+						<ListGroup.Item variant="dark">
 							<Row>
 								<Col>
 									<h4 className="mt-4">Velocity</h4>
 									<p className="m-0">Linear Velocity : {this.state.linear_velocity.toFixed(2)}</p>
 									<p className="m-0">Angular Velocity : {this.state.angular_velocity.toFixed(2)}</p>
-								</Col>
-								&emsp;&emsp;
+								</Col>&emsp;&emsp;&emsp;
 								<Col>
 									<h4 className="mt-4">Position</h4>
 									<p className="m-0">x : {this.state.x.toFixed(2)}</p>
 									<p className="m-0">y : {this.state.x.toFixed(2)}</p>
 									<p className="m-0">θ : {this.state.orientation.toFixed(2)}</p>
-									
+								</Col>
+								<Col>
+									<h4 className="mt-4">Encoder</h4>
+									<p className="m-0">Left Count : {this.state.lwheel.toFixed(0)}</p>
+									<p className="m-0">Right Count : {this.state.rwheel.toFixed(0)}</p>
 								</Col>
 							</Row>
 							<br/>

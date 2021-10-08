@@ -69,12 +69,12 @@ class Map extends Component {
 			withOrientation: true
 		});
 
-	    // // Setup the map client.
-	    // var gridClient = new window.ROS2D.OccupancyGridClient({
-	    //   ros : this.state.ros,
-	    //   rootObject : viewer.scene
-	    // });     
-	    // // Scale the canvas to fit to the map
+	    // Setup the map client.
+	    var gridClient = new window.ROS2D.OccupancyGridClient({
+	      ros : this.state.ros,
+	      rootObject : viewer.scene
+	    });     
+	    // Scale the canvas to fit to the map
 	    // gridClient.on('change', function(){
 	    //   viewer.scaleToDimensions(gridClient.currentGrid.width, gridClient.currentGrid.height);
 	    // });

@@ -2,21 +2,24 @@ import React, { Component } from "react";
 import {Image} from "react-bootstrap";
 import Config from "../scripts/config";
 
+
 class Camera extends Component {
 	state = {
-		
+
 	};
 
 	constructor(){
 		super();
 		this.init_video();
+
 	}
+
+
 
 	init_video(){
-		
+
 	}
 
-	
 
 	render() {
 		return ( 
