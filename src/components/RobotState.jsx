@@ -91,7 +91,7 @@ class RobotState extends Component {
 		pose_subscriber.subscribe((message)=>{
 			this.setState({x:message.pose.pose.position.x});
 			this.setState({y:message.pose.pose.position.y});
-			this.setState({orientation:this.getOrientationFromQuaternion(message.pose.pose.orientation).toFixed(2)});
+			this.setState({orientation:this.getOrientationFromQuaternion(message.pose.pose.orientation)});
 		});
 
 		//create a pwm subscriber
@@ -233,7 +233,7 @@ class RobotState extends Component {
 								<Col>
 									<h4 className="mt-4">Position</h4>
 									<p className="m-0">x : {this.state.x.toFixed(2)}</p>
-									<p className="m-0">y : {this.state.x.toFixed(2)}</p>
+									<p className="m-0">y : {this.state.y.toFixed(2)}</p>
 									<p className="m-0">θ : {this.state.orientation.toFixed(2)}</p>
 								</Col>
 								<Col>
