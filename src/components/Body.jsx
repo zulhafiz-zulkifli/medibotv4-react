@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import {Container} from "react-bootstrap";
 import {Route, BrowserRouter as Router, Switch} from "react-router-dom"
-import Home from './Home';
+import Monitor from './Monitor';
 import Navigation from './Navigation';
 
 class Body extends Component {
@@ -11,8 +11,8 @@ class Body extends Component {
 			<Container>
 				<Router>
 					<Switch>
-						<Route path="/" exact component={Home}></Route>
-						<Route path="/Navigation" exact component={Navigation}></Route>
+						<Route path="/" exact component={Navigation}></Route>
+						<Route path="/Monitor" exact component={Monitor}></Route>
 					</Switch>
 				</Router>
 			</Container>

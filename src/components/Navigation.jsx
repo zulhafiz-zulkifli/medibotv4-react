@@ -24,7 +24,7 @@ class Navigation extends Component {
 							<RobotState/>
 						</Col>
 						<Col>
-							<h1 className="text-center">MAP</h1>
+							<h1 className="text-center">NAVIGATION</h1>
 							<Map/>
 						</Col>
 					</Row>

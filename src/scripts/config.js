@@ -7,8 +7,8 @@ const Config = {
 	PWM_TOPIC : "/pwm",
 	PWM_TURN_TOPIC : "/pwm_turn",
 	PWM_CONTROL_TOPIC : "/pwm_control",
-	ENCODER_LEFT_TOPIC : "/lwheel",
-	ENCODER_RIGHT_TOPIC : "/rwheel",
+	ENCODER_LEFT_TOPIC : "/lwheel_ticks",
+	ENCODER_RIGHT_TOPIC : "/rwheel_ticks",
 	FRONT_CAM_SRC : "http://"+window.location.hostname+":8080/stream?topic=/usb_cam/image_raw",
 	ERROR_CAM_SRC : "images/novideo.jpg"
 };

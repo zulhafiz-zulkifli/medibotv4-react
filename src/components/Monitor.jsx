@@ -4,7 +4,7 @@ import RobotState from "./RobotState";
 import Camera from "./Camera";
 import {Row, Col, Container} from "react-bootstrap";
 
-class Home extends Component {
+class Monitor extends Component {
 	state = {
 		
 	};
@@ -39,4 +39,4 @@ class Home extends Component {
 	}
 }
 
-export default Home;
+export default Monitor;
