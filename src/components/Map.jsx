@@ -7,12 +7,17 @@ import Config from "../scripts/config";
 class Map extends Component {
 	state = {
 		ros:null,
-		show_path:false
+		viewer:null,
+		show_path:false,
+		pathView:null,
+		pathTopic:null
 	};
 
 	constructor(){
 		super();
 		this.view_map = this.view_map.bind(this);
+		this.showPath = this.showPath.bind(this);
+		this.hidePath = this.hidePath.bind(this);
 	}
 
 	init_connection(){
@@ -59,7 +64,8 @@ class Map extends Component {
 
 
 	view_map(){
-		var viewer = new window.ROS2D.Viewer({
+		// eslint-disable-next-line
+		this.state.viewer = new window.ROS2D.Viewer({
 			divID: "nav_div",
 			width: 640,
 			height: 480,
@@ -67,77 +73,49 @@ class Map extends Component {
 
 		var navClient = new window.NAV2D.OccupancyGridClientNav({
 			ros: this.state.ros,
-			rootObject: viewer.scene,
-			viewer: viewer,
+			rootObject: this.state.viewer.scene,
+			viewer: this.state.viewer,
 			serverName: '/move_base',
 			withOrientation: true,
 			continuous: true,
 		});
-		//this.navClient.upathed();
-	    // Setup the map client.
-	    // var gridClient = new window.ROS2D.OccupancyGridClient({
-	    //   ros : this.state.ros,
-	    //   rootObject : viewer.scene
-	    // });     
+		
 	    // Scale the canvas to fit to the map
 	    // gridClient.on('change', function(){
 	    //   viewer.scaleToDimensions(gridClient.currentGrid.width, gridClient.currentGrid.height);
 	    // });
-       	
-	    //pathed() function
-        var pathView = new window.ROS2D.PathShape({
-            ros: this.state.ros,
-            strokeSize: 0.1,
-            strokeColor: "green",
-        });
-
-        viewer.scene.addChild(pathView);
-
-        var pathTopic = new window.ROSLIB.Topic({
-            ros: this.state.ros,
-            name: '/move_base/NavfnROS/plan',
-            messageType: 'nav_msgs/Path'
-        });
-
-        pathTopic.subscribe(function(message) {
-            pathView.setPath(message);
-        });
-        //upathed() function
-        // that.rootObject.removeChild(pathView);
-        // if (pathTopic) {
-        //     pathTopic.unsubscribe();
-        // }
-        // pathView = null;
-        // pathTopic = null;
-	}
-
-
-	changeROSState(){
-		this.setState({show_path:!this.state.show_path});
-		// if (this.state.show_path){
-  //           window.pathed;
-  //       }
-  //       else{
-  //           window.upathed;
-  //       }
-  		// if(this.state.show_path){
-  		// 	window.navigation = true;
-    //     	//window.homing = false;
-  		// }
-  		// else{
-  		// 	window.navigation = false;
-    //     	//window.homing = true;
-  		// }
 	}
 
 	navigation(){
+		if(this.state.pathView==null && this.state.pathTopic==null && this.state.show_path){
+			this.showPath();
+		}
 		window.navigation = true;
 		window.homing = false;
+
 	}
 
 	localize(){
+		if(this.state.pathView==null && this.state.pathTopic==null && this.state.show_path){
+			this.showPath();
+		}
 		window.navigation = false;
 		window.homing = true;
+	}
+
+	stop(){
+		window.navigation = false;
+		window.homing = false;
+		var move_base_stop = new window.ROSLIB.Topic({
+	        ros: this.state.ros,
+	        name: '/move_base/cancel',
+	        messageType: 'actionlib_msgs/GoalID'
+	    });
+	    var move_base_stop_msg = new window.ROSLIB.Message({
+	        id: ''
+	    });
+	    move_base_stop.publish(move_base_stop_msg);
+	    this.hidePath(true);
 	}
 
 	resetnavloc(){
@@ -145,6 +123,41 @@ class Map extends Component {
 		window.homing = false;
 	}
 
+	showPath(){
+		this.setState({show_path:true});
+		if(this.state.pathView==null && this.state.pathTopic==null){
+			this.state.pathView = new window.ROS2D.PathShape({
+	            ros: this.state.ros,
+	            strokeSize: 0.2,
+	            strokeColor: "green",
+	        });
+
+	        this.state.viewer.scene.addChild(this.state.pathView);
+
+	        this.state.pathTopic = new window.ROSLIB.Topic({
+	            ros: this.state.ros,
+	            name: '/move_base/NavfnROS/plan',
+	            messageType: 'nav_msgs/Path'
+	        });
+
+	        this.state.pathTopic.subscribe((message)=>{
+	            this.state.pathView.setPath(message);
+	        });
+		}
+	}
+
+	hidePath(isStopping=false){
+		if(!isStopping){
+			this.setState({show_path:false});
+		}
+		
+        this.state.viewer.scene.removeChild(this.state.pathView);
+        if (this.state.pathTopic) {
+            this.state.pathTopic.unsubscribe();
+        }
+        this.setState({pathView:null});
+        this.setState({pathTopic:null});
+	}
 
 	render() {
 		return ( 
@@ -152,11 +165,12 @@ class Map extends Component {
 
 			<p id="nav_div"></p>
 
-			{/*<BootstrapSwitchButton id="show-path-btn" onChange={()=>{this.changeROSState()}}  onstyle="info" />*/}
+			&emsp;&emsp;&emsp;&emsp;PATH VIEW&emsp;<BootstrapSwitchButton checked={this.state.show_path?true:false} onChange={()=>{this.state.show_path?this.hidePath():this.showPath()}}  onstyle="info" offstyle="secondary" onlabel="ON" offlabel="OFF"/>
+			&emsp;&emsp;&emsp;&emsp;
 			<ButtonGroup horizontal size="md">
 			 	<Button onClick={()=>{this.localize()}} variant="success">LOCALIZE</Button>
 			 	<Button onClick={()=>{this.navigation()}} variant="primary">NAVIGATE</Button>
-			 	<Button onClick={()=>{this.resetnavloc()}} variant="secondary">RESET</Button>
+			 	<Button onClick={()=>{this.stop()}} variant="danger">STOP</Button>
 			</ButtonGroup>
 			</div>
 		);

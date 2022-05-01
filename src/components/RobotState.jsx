@@ -227,14 +227,14 @@ class RobotState extends Component {
 							<Row>
 								<Col>
 									<h4 className="mt-4">Velocity</h4>
-									<p className="m-0">Linear Velocity : {this.state.linear_velocity.toFixed(2)}</p>
-									<p className="m-0">Angular Velocity : {this.state.angular_velocity.toFixed(2)}</p>
+									<p className="m-0">Linear&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: {this.state.linear_velocity.toFixed(2)}</p>
+									<p className="m-0">Angular : {this.state.angular_velocity.toFixed(2)}</p>
 								</Col>&emsp;&emsp;&emsp;
 								<Col>
 									<h4 className="mt-4">Position</h4>
 									<p className="m-0">x : {this.state.x.toFixed(2)}</p>
 									<p className="m-0">y : {this.state.y.toFixed(2)}</p>
-									<p className="m-0">θ : {this.state.orientation.toFixed(2)}</p>
+									<p className="m-0">θ : {this.state.orientation.toFixed(0)}</p>
 								</Col>
 								<Col>
 									<h4 className="mt-4">Encoder</h4>
