@@ -239,7 +239,7 @@ class Map extends Component {
     getSpot(){
 		var get_spot = new window.ROSLIB.Service({
 			ros : this.state.ros,
-			name : '/save_spots/get_spot',
+			name : '/spots/get_spot',
 			serviceType : 'medibotv4/GetSpot'
 		});
 
@@ -264,7 +264,7 @@ class Map extends Component {
 
     	var send_goal = new window.ROSLIB.Service({
 			ros : this.state.ros,
-			name : '/save_spots/send_goal',
+			name : '/spots/send_goal',
 			serviceType : 'medibotv4/SendGoal'
 		});
 
@@ -300,7 +300,7 @@ class Map extends Component {
 
     	var set_spot = new window.ROSLIB.Service({
 			ros : this.state.ros,
-			name : '/save_spots/set_spot',
+			name : '/spots/set_spot',
 			serviceType : 'medibotv4/SetSpot'
 		});
 
