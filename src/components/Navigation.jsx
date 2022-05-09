@@ -20,12 +20,14 @@ class Navigation extends Component {
 					<br/>
 					<Row>
 						<Col>
-							<h1 className="text-center">ROBOT STATE</h1>
-							<RobotState/>
-						</Col>
-						<Col>
-							<h1 className="text-center">NAVIGATION</h1>
+							{/*<h1 className="text-center">NAVIGATION</h1>*/}
 							<Map/>
+						</Col>
+					</Row>
+					<Row>
+						<Col>
+							{/*<h1 className="text-center">ROBOT STATE</h1>*/}
+							<RobotState/>
 						</Col>
 					</Row>
 {/*					<Row>

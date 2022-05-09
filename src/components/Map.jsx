@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import {Row, Col, Form, Button, ButtonGroup, ListGroup, FloatingLabel, Modal} from "react-bootstrap";
+import {Row, Col, Form, Button, ButtonGroup, ListGroup, FloatingLabel, Modal, Alert} from "react-bootstrap";
 import BootstrapSwitchButton from "bootstrap-switch-button-react";
-import ClickNHold from "react-click-n-hold"; 
+import { IoNavigate, IoCloseCircleOutline, IoLocation, IoRemoveOutline, IoAddOutline, IoCaretBack, IoCaretForward, IoCaretUp, IoCaretDown } from "react-icons/io5";
+import { MdRemove } from "react-icons/md";
 import Config from "../scripts/config";
 window.navigation = false;
 window.homing = false;
@@ -16,7 +17,8 @@ class Map extends Component {
 		pathView:null,
 		pathTopic:null,
 		label:[],
-		show_set_spot: false
+		show_set_spot:false,
+		goal_status:{message: "Doing nothing. Waiting for goal...",variant: "info",show:true},
 	};
 
 	constructor(){
@@ -69,8 +71,8 @@ class Map extends Component {
 	componentDidMount(){
 		this.init_connection();
 		this.view_map();
+		this.getGoalStatus();
 		this.getSpot();
-
 	}
 
 
@@ -253,9 +255,7 @@ class Map extends Component {
 		setTimeout(() => {
 			this.setState({ label: []});
 			this.setState({ label: this.state.label.concat(temp_label)});
-			console.log("This is it!!!");
-			console.log(this.state.label);
-		}, 2000);
+		}, 500);
     }
 
     sendGoal(){
@@ -281,9 +281,7 @@ class Map extends Component {
 			if(this.state.pathView==null && this.state.pathTopic==null && this.state.show_path){
 				this.showPath();
 			}
-		}, 100);
-
-		
+		}, 100);	
     }
 
     setSpot(act){
@@ -322,63 +320,108 @@ class Map extends Component {
 		}, 500);
     }
 
+	getGoalStatus(){
+		var goal_status_sub = new window.ROSLIB.Topic({
+			ros : this.state.ros,
+			name : '/move_base/status',
+			messageType : 'actionlib_msgs/GoalStatusArray'
+		});
+		goal_status_sub.subscribe((message)=>{
+			var i;
+			for(i=0; i<message.status_list.length; i++){
+				if(message.status_list[i].status === 1){
+					this.setState({goal_status:{message:"Goal received. Moving there...",variant:"warning",status:true}});
+				}
+			}			
+		});
+
+		var goal_result_sub = new window.ROSLIB.Topic({
+			ros : this.state.ros,
+			name : '/move_base/result',
+			messageType : 'move_base_msgs/MoveBaseActionResult'
+		});
+		goal_result_sub.subscribe((message)=>{
+			if(message.status.status === 2){
+				this.setState({goal_status:{message:"Goal canceled.",variant:"danger",status:true}});
+			}
+			else if(message.status.status === 3){
+				this.setState({goal_status:{message:"Goal reached successfully.",variant:"success",status:true}});
+				this.hidePath(true);
+			}	
+			setTimeout(() => {this.setState({goal_status:{message:"Doing nothing. Waiting for goal...",variant:"info",status:true}});}, 5000);
+		});
+	}
+
+
 	render() {
 		return ( 
-			<div>			
-				<ListGroup.Item variant="dark">
+			<div>
+				<ListGroup.Item variant="light">
+					<Alert variant={this.state.goal_status.variant} show={this.state.goal_status.show}>
+						{this.state.goal_status.message}
+					</Alert>
 					<Row>
-						<p id="nav_div"></p>
 						<Col>
 							<Row>
-								<ButtonGroup horizontal size="md">
-								 	<Button onClick={()=>{this.localize()}} variant="success">LOCALIZE</Button>
-								 	<Button onClick={()=>{this.navigation()}} variant="primary">NAVIGATE</Button>
-								 	<Button onClick={()=>{this.stop()}} variant="danger">STOP</Button>
-								</ButtonGroup>
-								<p></p>
-								<div>
-								SHOW PATH&emsp;<BootstrapSwitchButton checked={this.state.show_path?true:false} onChange={()=>{this.state.show_path?this.hidePath():this.showPath()}}  onstyle="info" offstyle="secondary" onlabel="ON" offlabel="OFF"/>
-								</div>
+								<p id="nav_div"></p>
 							</Row>
-					 	</Col>
+							<Row>
+								<Col align="center">
+									<ButtonGroup horizontal size="lg">
+									 	<Button onClick={()=>{this.localize()}} variant="success"> LOCALIZE <IoLocation/></Button>
+									 	<Button onClick={()=>{this.navigation()}} variant="primary">NAVIGATE <IoNavigate/></Button>
+									 	<Button onClick={()=>{this.stop()}} variant="danger">STOP <IoCloseCircleOutline/></Button>
+									</ButtonGroup>
+								</Col>
+						 	</Row><br></br>
+						 	<Row>
+								<Col align="center">
+										SHOW PATH&emsp;<BootstrapSwitchButton size="md" checked={this.state.show_path?true:false} onChange={()=>{this.state.show_path?this.hidePath():this.showPath()}}  onstyle="primary" offstyle="secondary" onlabel="ON" offlabel="OFF"/>
+								</Col>
+						 	</Row>
+						</Col>
 					 	<Col>
-
-					 		ZOOM/PAN VIEW&emsp;
-					 		<ButtonGroup vertical size="sm" className="gap-4">				
-								<Button onClick={()=>{this.zoomInMap()}} variant="secondary"> + </Button>
-						 		<Button onClick={()=>{this.zoomOutMap()}} variant="secondary"> - </Button>
-						 	</ButtonGroup>&nbsp;&nbsp;&nbsp;
-
-
-						 	<ButtonGroup size="sm" className="gap-1">	
-						 		<Button size="sm" onClick={()=>{this.panLeftMap()}} variant="secondary"> ← </Button>
-						 	</ButtonGroup>&nbsp;
-						 	<ButtonGroup vertical size="sm" className="gap-4">		
-							 	<Button size="sm" onClick={()=>{this.panUpMap()}} variant="secondary"> ↑ </Button>
-							 	<Button size="sm" onClick={()=>{this.panDownMap()}} variant="secondary"> ↓ </Button>
-							</ButtonGroup>&nbsp;
-							<ButtonGroup size="sm" className="gap-1">
-						 		<Button size="sm" onClick={()=>{this.panRightMap()}} variant="secondary"> → </Button>
-						 	</ButtonGroup>	
-
-					 	</Col><p></p>
-					 	<Col>
-						 	<Form size="xs">    
-							 	<FloatingLabel label="Select a spot" size="xs">
-								 	<Form.Control as="select" ref="select_spot_form_ref" size="xs">
-							            {this.state.label.map((x) => (<option key={x} value={x}>{x}</option>))}
-								 	</Form.Control>
-								</FloatingLabel>
-							 	<p></p>
-							 	<ButtonGroup size="sm" className="gap-1">
-						 			<Button size="sm" onClick={()=>{this.sendGoal()}} variant="secondary"> GOTO </Button>
-						 			<Button size="sm" onClick={()=>{this.setState({show_set_spot:!this.state.show_set_spot});}} variant="secondary"> SAVE </Button>
-						 			<Button size="sm" onClick={()=>{this.setSpot("remove")}} variant="secondary"> REMOVE </Button>
-						 			<Button size="sm" onClick={()=>{this.setSpot("clear")}} variant="secondary"> CLEAR ALL </Button>
-						 		</ButtonGroup>	
-							 	
-						 	</Form>
-
+					 		<br></br><br></br><br></br><br></br>
+						 	<Row>
+						 		<Col align="center"><h5>
+									ZOOM VIEW&emsp;
+							 		<ButtonGroup vertical size="md" className="gap-2">				
+										<Button className="rounded-circle" onClick={()=>{this.zoomInMap()}} variant="secondary"><IoAddOutline/></Button>
+								 		<Button className="rounded-circle" onClick={()=>{this.zoomOutMap()}} variant="secondary"><IoRemoveOutline/></Button>
+								 	</ButtonGroup>&nbsp;&nbsp;&nbsp;
+								 	PAN VIEW&emsp;
+								 	<ButtonGroup size="md">	
+								 		<Button className="rounded-circle" onClick={()=>{this.panLeftMap()}} variant="secondary"><IoCaretBack/></Button>
+								 	</ButtonGroup>
+								 	<ButtonGroup vertical size="md" className="gap-3">		
+									 	<Button className="rounded-circle" onClick={()=>{this.panUpMap()}} variant="secondary"><IoCaretUp/></Button>
+									 	<Button className="rounded-circle" onClick={()=>{this.panDownMap()}} variant="secondary"><IoCaretDown/></Button>
+									</ButtonGroup>
+									<ButtonGroup size="md">
+								 		<Button className="rounded-circle" onClick={()=>{this.panRightMap()}} variant="secondary"><IoCaretForward/></Button>
+								 	</ButtonGroup>	</h5>
+							 	</Col>
+						 	</Row>
+						 	<br></br><br></br><br></br>
+						 	<Row>
+						 		<Col align="center">
+							 		<h5>SPOT-BASED NAVIGATION</h5>
+						 			<Form size="md">    
+									 	<FloatingLabel label="Select a spot" size="xs">
+										 	<Form.Control as="select" ref="select_spot_form_ref" size="xs" onClick={()=>{if(this.refs.select_spot_form_ref.value===""){this.getSpot();}}}>
+									            {this.state.label.map((x) => (<option key={x} value={x}>{x}</option>))}
+										 	</Form.Control>
+										</FloatingLabel>
+									 	<p></p>
+									 	<ButtonGroup className="gap-1">
+								 			<Button onClick={()=>{this.sendGoal()}} variant="secondary"> GOTO </Button>
+								 			<Button onClick={()=>{this.setState({show_set_spot:!this.state.show_set_spot});}} variant="secondary"> SAVE </Button>
+								 			<Button onClick={()=>{this.setSpot("remove")}} variant="secondary"> REMOVE </Button>
+								 			<Button onClick={()=>{this.setSpot("clear")}} variant="secondary"> CLEAR ALL </Button>
+								 		</ButtonGroup>						 	
+								 	</Form>
+							 	</Col>
+						 	</Row>
 					 	</Col>
 					</Row>
 				</ListGroup.Item>
@@ -397,6 +440,9 @@ class Map extends Component {
 			          <Button variant="success" onClick={()=>{this.setSpot("add")}}>SAVE</Button>
 			        </Modal.Footer>
 			      </Modal>
+
+
+
 
 			</div>
 

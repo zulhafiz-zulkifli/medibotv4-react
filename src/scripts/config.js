@@ -3,7 +3,7 @@ const Config = {
 	ROSBRIDGE_SERVER_PORT : "9090",
 	RECONNECTION_TIMER : 200,
 	CMD_VEL_TOPIC : "/cmd_vel",
-	ODOM_TOPIC : "/odom",
+	ODOM_TOPIC : "/amcl_pose",
 	PWM_TOPIC : "/pwm",
 	PWM_TURN_TOPIC : "/pwm_turn",
 	PWM_CONTROL_TOPIC : "/pwm_control",

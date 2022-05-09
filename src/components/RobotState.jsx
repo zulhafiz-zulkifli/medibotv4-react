@@ -85,7 +85,7 @@ class RobotState extends Component {
 		var pose_subscriber = new window.ROSLIB.Topic({
 			ros : this.state.ros,
 			name : Config.ODOM_TOPIC,
-			messageType : "nav_msgs/Odometry"
+			messageType : "geometry_msgs/PoseWithCovarianceStamped"
 		});
 		//create a pose callback
 		pose_subscriber.subscribe((message)=>{
@@ -190,7 +190,7 @@ class RobotState extends Component {
 		return ( 
 			<div>
 				<ListGroup>
-						<ListGroup.Item variant="light">
+{/*						<ListGroup.Item variant="light">
 							<Row>
 								<Col>
 									<h4 className="mt-4">PWM Control&ensp;
@@ -222,7 +222,7 @@ class RobotState extends Component {
 									<br/><Teleoperation/>
 								</Col>
 							</Row>
-						</ListGroup.Item>
+						</ListGroup.Item>*/}
 						<ListGroup.Item variant="dark">
 							<Row>
 								<Col>
