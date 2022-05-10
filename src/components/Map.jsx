@@ -4,6 +4,7 @@ import BootstrapSwitchButton from "bootstrap-switch-button-react";
 import { IoNavigate, IoCloseCircleOutline, IoLocation, IoRemoveOutline, IoAddOutline, IoCaretBack, IoCaretForward, IoCaretUp, IoCaretDown, IoNavigateOutline, IoSaveOutline, IoTrashOutline } from "react-icons/io5";
 import { VscClearAll } from "react-icons/vsc";
 import Config from "../scripts/config";
+import Teleoperation from "./Teleoperation";
 window.navigation = false;
 window.homing = false;
 
@@ -73,6 +74,7 @@ class Map extends Component {
 		this.view_map();
 		this.getGoalStatus();
 		this.getSpot();
+		this.showPath();
 	}
 
 
@@ -162,7 +164,12 @@ class Map extends Component {
 	        });
 
 	        this.state.pathTopic.subscribe((message)=>{
-	            this.state.pathView.setPath(message);
+	        	try{
+	        		this.state.pathView.setPath(message);
+	        	}catch(error){
+	        		console.error("show path error");
+	        	}
+	            
 	        });
 		}
 	}
@@ -365,25 +372,27 @@ class Map extends Component {
 							<Row>
 								<p id="nav_div"></p>
 							</Row>
-							<Row>
-								<Col align="center">
+							<Row align="center">
 									<ButtonGroup horizontal size="lg">
 									 	<Button onClick={()=>{this.localize()}} variant="success"> LOCALIZE <IoLocation/></Button>
 									 	<Button onClick={()=>{this.navigation()}} variant="primary">NAVIGATE <IoNavigate/></Button>
 									 	<Button onClick={()=>{this.stop()}} variant="danger">STOP <IoCloseCircleOutline/></Button>
 									</ButtonGroup>
-								</Col>
 						 	</Row><br></br>
-						 	<Row>
-								<Col align="center">
-										SHOW PATH&emsp;<BootstrapSwitchButton size="md" checked={this.state.show_path?true:false} onChange={()=>{this.state.show_path?this.hidePath():this.showPath()}}  onstyle="primary" offstyle="secondary" onlabel="ON" offlabel="OFF"/>
-								</Col>
+						 	<Row align="left">
+								<Col></Col><Col>
+									<h6>
+									<Form>
+									  <Form.Check label="SHOW PATH" type="switch" id="show-path-switch" checked={this.state.show_path?true:false} onChange={()=>{this.state.show_path?this.hidePath():this.showPath()}}/>
+									</Form>
+									</h6>
+								</Col><Col></Col>
 						 	</Row>
 						</Col>
 					 	<Col>
-					 		<br></br><br></br><br></br><br></br>
-						 	<Row>
-						 		<Col align="center"><h5>
+					 		<br></br>
+						 	<Row align="center">
+						 		<h5>
 									ZOOM VIEW&emsp;
 							 		<ButtonGroup vertical size="md" className="gap-2">				
 										<Button className="rounded-circle" onClick={()=>{this.zoomInMap()}} variant="secondary"><IoAddOutline/></Button>
@@ -399,29 +408,32 @@ class Map extends Component {
 									</ButtonGroup>
 									<ButtonGroup size="md">
 								 		<Button className="rounded-circle" onClick={()=>{this.panRightMap()}} variant="secondary"><IoCaretForward/></Button>
-								 	</ButtonGroup>	</h5>
-							 	</Col>
+								 	</ButtonGroup>	
+								 </h5>
 						 	</Row>
-						 	<br></br><br></br><br></br>
-						 	<Row>
-						 		<Col align="center">
-							 		<h5>SPOT-BASED NAVIGATION</h5>
-						 			<Form size="md">    
-									 	<FloatingLabel label="Select a spot" size="xs">
-										 	<Form.Control as="select" ref="select_spot_form_ref" size="xs" onClick={()=>{if(this.refs.select_spot_form_ref.value===""){this.getSpot();}}}>
-									            {this.state.label.map((x) => (<option key={x} value={x}>{x}</option>))}
-										 	</Form.Control>
-										</FloatingLabel>
-									 	<p></p>
-									 	<ButtonGroup className="gap-1">
-								 			<Button onClick={()=>{this.sendGoal()}} variant="secondary">GOTO <IoNavigateOutline/></Button>
-								 			<Button onClick={()=>{this.setState({show_set_spot:!this.state.show_set_spot});}} variant="secondary">SAVE <IoSaveOutline/></Button>
-								 			<Button onClick={()=>{this.setSpot("remove")}} variant="secondary">REMOVE <IoTrashOutline/></Button>
-								 			<Button onClick={()=>{this.setSpot("clear")}} variant="secondary">CLEAR ALL <VscClearAll/></Button>
-								 		</ButtonGroup>						 	
-								 	</Form>
-							 	</Col>
+						 	<br></br><hr></hr><br></br>
+						 	<Row align="center">
+						 		<h5>WAYPOINT NAVIGATION</h5><br></br>
+					 			<Form size="md">    
+								 	<FloatingLabel label="Select a spot" size="xs">
+									 	<Form.Control as="select" ref="select_spot_form_ref" size="xs" onClick={()=>{if(this.refs.select_spot_form_ref.value===""){this.getSpot();}}}>
+								            {this.state.label.map((x) => (<option key={x} value={x}>{x}</option>))}
+									 	</Form.Control>
+									</FloatingLabel>
+								 	<p></p>
+								 	<ButtonGroup className="gap-1">
+							 			<Button onClick={()=>{this.sendGoal()}} variant="secondary">GOTO <IoNavigateOutline/></Button>
+							 			<Button onClick={()=>{this.setState({show_set_spot:!this.state.show_set_spot});}} variant="secondary">SAVE <IoSaveOutline/></Button>
+							 			<Button onClick={()=>{this.setSpot("remove")}} variant="secondary">REMOVE <IoTrashOutline/></Button>
+							 			<Button onClick={()=>{this.setSpot("clear")}} variant="secondary">CLEAR ALL <VscClearAll/></Button>
+							 		</ButtonGroup>						 	
+							 	</Form>
 						 	</Row>
+						 	<br></br><hr></hr><br></br>
+						 	<Row align="center">
+						 		<h5>TELEOPERATION</h5><br></br><br></br>
+					 			<Teleoperation/>
+						 	</Row>			 	
 					 	</Col>
 					</Row>
 				</ListGroup.Item>

@@ -17,7 +17,6 @@ class Navigation extends Component {
 							<Connection/>
 						</Col>
 					</Row>
-					<br/>
 					<Row>
 						<Col>
 							{/*<h1 className="text-center">NAVIGATION</h1>*/}

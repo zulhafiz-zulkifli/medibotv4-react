@@ -1,10 +1,15 @@
 import React, { Component } from "react";
 import { Joystick } from "react-joystick-component";
+import {Row, Col, Form, InputGroup, Card} from "react-bootstrap";
+import { BsJoystick, BsKeyboard } from "react-icons/bs";
 import Config from "../scripts/config";
 
 class Teleoperation extends Component {
 	state = {
-		ros : null
+		ros : null,
+		key_teleop : true,
+		key_teleop_obj : null,
+		joy_teleop : false
 	};
 
 	constructor(){
@@ -13,9 +18,20 @@ class Teleoperation extends Component {
 		this.initTeleopKeyboard();
 		this.handleMove = this.handleMove.bind(this);
 		this.handleStop = this.handleStop.bind(this);
+		this.initTeleopKeyboard = this.initTeleopKeyboard.bind(this);
 	}
 
-
+	changeTeleopState(){
+		this.setState({key_teleop:!this.state.key_teleop});
+		this.setState({joy_teleop:!this.state.joy_teleop});
+		console.log("key_teleop : "+this.state.key_teleop+" , joy_teleop : "+this.state.joy_teleop);
+		if(this.state.key_teleop){
+		    this.state.key_teleop_obj.scale=1.0;
+		}
+		else{
+			this.state.key_teleop_obj.scale=0.0;
+		}
+	}
 
 	init_connection(){
 		// eslint-disable-next-line
@@ -50,14 +66,13 @@ class Teleoperation extends Component {
 	}
 
 	initTeleopKeyboard() {
-	    if (teleop == null) {
-	        // Initialize the teleop.
-	        var teleop = new window.KEYBOARDTELEOP.Teleop({
+	    if (this.state.key_teleop_obj == null){
+	        this.state.key_teleop_obj = new window.KEYBOARDTELEOP.Teleop({
 	            ros: this.state.ros,
 	            topic: '/cmd_vel'
 	        });
+	        this.state.key_teleop_obj.scale=0.0;
 	    }
-	    //console.log('TeleopKeyboard Initialized.');
 	}
 
 	handleMove(event){
@@ -82,7 +97,7 @@ class Teleoperation extends Component {
 			}
 		});
 		//publish the message to /cmd_vel
-		cmd_vel.publish(twist);
+		cmd_vel.publish(twist);					
 	}
 
 	handleStop(event){
@@ -107,19 +122,30 @@ class Teleoperation extends Component {
 			}
 		});
 		//publish the message to /cmd_vel
-		cmd_vel.publish(twist);
+		cmd_vel.publish(twist);				
+
 	}
 
 	render() {
 		return ( 
 			<div>
-				<Joystick 
-				size={150} 
-				baseColor="#BBBBBB"
-				stickColor="#EEEEEE" 
-				move={this.handleMove} 
-				stop={this.handleStop}
-				></Joystick>
+			<Row>
+				<Col align="center">
+					  	<Joystick disabled={this.state.joy_teleop} size={100} baseColor="#BBBBBB" stickColor={this.state.joy_teleop?"#DDDDDD":"#EEEEEE"} move={this.state.joy_teleop?this.handleStop:this.handleMove} stop={this.handleStop}/>
+				</Col>
+				<Col align="left">
+					<Form>
+                    <InputGroup>
+                        <Form.Check label="KEYBOARD" name="teleop" type="radio" id="key-teleop-radio" ref="key_teleop_radio_ref" checked={!this.state.key_teleop}  onChange={()=>{this.changeTeleopState();}}/>
+                        &emsp;<BsKeyboard size={30}/>
+                    </InputGroup><br></br>
+                    <InputGroup>
+                        <Form.Check label="JOYSTICK" name="teleop" type="radio" id="joy-teleop-radio" ref="joy_teleop_radio_ref" checked={!this.state.joy_teleop}  onChange={()=>{this.changeTeleopState();}}/>
+                        &emsp;&ensp;<BsJoystick size={30}/>
+                    </InputGroup>                    
+                    </Form>
+				</Col>
+			</Row>
 			</div>
 		);
 	}
