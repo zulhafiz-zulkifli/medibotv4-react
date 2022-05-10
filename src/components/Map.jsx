@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import {Row, Col, Form, Button, ButtonGroup, ListGroup, FloatingLabel, Modal, Alert} from "react-bootstrap";
 import BootstrapSwitchButton from "bootstrap-switch-button-react";
-import { IoNavigate, IoCloseCircleOutline, IoLocation, IoRemoveOutline, IoAddOutline, IoCaretBack, IoCaretForward, IoCaretUp, IoCaretDown } from "react-icons/io5";
-import { MdRemove } from "react-icons/md";
+import { IoNavigate, IoCloseCircleOutline, IoLocation, IoRemoveOutline, IoAddOutline, IoCaretBack, IoCaretForward, IoCaretUp, IoCaretDown, IoNavigateOutline, IoSaveOutline, IoTrashOutline } from "react-icons/io5";
+import { VscClearAll } from "react-icons/vsc";
 import Config from "../scripts/config";
 window.navigation = false;
 window.homing = false;
@@ -414,10 +414,10 @@ class Map extends Component {
 										</FloatingLabel>
 									 	<p></p>
 									 	<ButtonGroup className="gap-1">
-								 			<Button onClick={()=>{this.sendGoal()}} variant="secondary"> GOTO </Button>
-								 			<Button onClick={()=>{this.setState({show_set_spot:!this.state.show_set_spot});}} variant="secondary"> SAVE </Button>
-								 			<Button onClick={()=>{this.setSpot("remove")}} variant="secondary"> REMOVE </Button>
-								 			<Button onClick={()=>{this.setSpot("clear")}} variant="secondary"> CLEAR ALL </Button>
+								 			<Button onClick={()=>{this.sendGoal()}} variant="secondary">GOTO <IoNavigateOutline/></Button>
+								 			<Button onClick={()=>{this.setState({show_set_spot:!this.state.show_set_spot});}} variant="secondary">SAVE <IoSaveOutline/></Button>
+								 			<Button onClick={()=>{this.setSpot("remove")}} variant="secondary">REMOVE <IoTrashOutline/></Button>
+								 			<Button onClick={()=>{this.setSpot("clear")}} variant="secondary">CLEAR ALL <VscClearAll/></Button>
 								 		</ButtonGroup>						 	
 								 	</Form>
 							 	</Col>
