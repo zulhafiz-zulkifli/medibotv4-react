@@ -1,8 +1,11 @@
 # medibotv4-react
 
-# Getting Started with Create React App
+## Sucessfully run on:
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+npm v8.5.0
+node v16.14.2
+react v17.0.2
+
 
 ## Available Scripts
 
