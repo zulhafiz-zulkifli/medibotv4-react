@@ -1,10 +1,14 @@
 # medibotv4-react
 
-## Sucessfully run on:
+## Installation
 
-npm v8.5.0
-node v16.14.2
-react v17.0.2
+Install Nodejs 16 by the following command (it comes with npm):
+
+### `curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -`
+### `sudo apt-get install -y nodejs`
+
+
+Sucessfully run on: npm v8.5.0, node v16.14.2, react v17.0.2
 
 
 ## Available Scripts
