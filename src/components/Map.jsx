@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import {Row, Col, Form, Button, ButtonGroup, ListGroup, FloatingLabel, Modal, Alert} from "react-bootstrap";
-import BootstrapSwitchButton from "bootstrap-switch-button-react";
 import { IoNavigate, IoCloseCircleOutline, IoLocation, IoRemoveOutline, IoAddOutline, IoCaretBack, IoCaretForward, IoCaretUp, IoCaretDown, IoNavigateOutline, IoSaveOutline, IoTrashOutline } from "react-icons/io5";
 import { VscClearAll } from "react-icons/vsc";
 import Config from "../scripts/config";
@@ -85,7 +84,7 @@ class Map extends Component {
 			width: 640,
 			height: 480,
 		});
-
+		// eslint-disable-next-line
 		var navClient = new window.NAV2D.OccupancyGridClientNav({
 			ros: this.state.ros,
 			rootObject: this.state.viewer.scene,
@@ -94,13 +93,16 @@ class Map extends Component {
 			withOrientation: true,
 			continuous: true,
 		});
-
-
-		
-	    // Scale the canvas to fit to the map
-	    // gridClient.on('change', function(){
-	    //   viewer.scaleToDimensions(gridClient.currentGrid.width, gridClient.currentGrid.height);
-	    // });
+		// eslint-disable-next-line
+		// var imageMapClientNav = new NAV2D.ImageMapClientNav({
+	 //        ros: this.state.ros,
+	 //        viewer: this.state.viewer,
+	 //        rootObject: this.state.viewer.scene,
+	 //        serverName: '/move_base',
+	 //        image: `/static/{value}.png`
+	 //    });
+	 //    imageMapClientNav.addImg();
+	 //    imageMapClientNav.removeImg();
 	}
 
 	navigation(){

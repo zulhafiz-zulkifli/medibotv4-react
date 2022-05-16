@@ -1,8 +1,7 @@
 import React, { Component } from "react";
-import {Row, Col, ListGroup, Button, ButtonGroup} from "react-bootstrap";
+import {Row, Col, ListGroup} from "react-bootstrap";
 import Config from "../scripts/config";
 import * as Three from "three";
-import Teleoperation from "./Teleoperation";
 
 class RobotState extends Component {
 	state = {

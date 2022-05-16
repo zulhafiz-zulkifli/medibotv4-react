@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Joystick } from "react-joystick-component";
-import {Row, Col, Form, InputGroup, Card} from "react-bootstrap";
+import {Row, Col, Form, InputGroup} from "react-bootstrap";
 import { BsJoystick, BsKeyboard } from "react-icons/bs";
 import Config from "../scripts/config";
 
