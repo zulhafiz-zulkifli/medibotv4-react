@@ -7,6 +7,9 @@ Install Nodejs 16 by the following command (it comes with npm):
 ### `curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -`
 ### `sudo apt-get install -y nodejs`
 
+Delete 'node_modules' directory if any and run this command to install all package dependencies:
+
+### `npm i`
 
 Sucessfully run on: npm v8.5.0, node v16.14.2, react v17.0.2
 

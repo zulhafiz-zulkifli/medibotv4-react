@@ -153,7 +153,7 @@ class Map extends Component {
 		if(this.state.pathView==null && this.state.pathTopic==null){
 			this.state.pathView = new window.ROS2D.PathShape({
 	            ros: this.state.ros,
-	            strokeSize: 0.2,
+	            strokeSize: 0.1,
 	            strokeColor: "green",
 	        });
 
