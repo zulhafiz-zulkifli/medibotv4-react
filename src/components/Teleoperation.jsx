@@ -69,7 +69,7 @@ class Teleoperation extends Component {
 	    if (this.state.key_teleop_obj == null){
 	        this.state.key_teleop_obj = new window.KEYBOARDTELEOP.Teleop({
 	            ros: this.state.ros,
-	            topic: '/cmd_vel'
+	            topic: '/key_vel'
 	        });
 	        this.state.key_teleop_obj.scale=0.0;
 	    }
@@ -80,7 +80,7 @@ class Teleoperation extends Component {
 		//create a ROS publisher to /cmd_vel
 		var cmd_vel = new window.ROSLIB.Topic({
 			ros: this.state.ros,
-			name: Config.CMD_VEL_TOPIC,
+			name: '/joy_vel',
 			messageType: "geometry_msgs/Twist"
 		});
 		//create twist message to be published
@@ -105,7 +105,7 @@ class Teleoperation extends Component {
 		//create a ROS publisher to /cmd_vel
 		var cmd_vel = new window.ROSLIB.Topic({
 			ros: this.state.ros,
-			name: Config.CMD_VEL_TOPIC,
+			name: '/joy_vel',
 			messageType: "geometry_msgs/Twist"
 		});
 		//create twist message to be published
